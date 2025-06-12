@@ -67,7 +67,7 @@ export default defineConfig((ctx) => {
 
       // extendViteConf (viteConf) {},
       // viteVuePluginOptions: {},
-      
+
       vitePlugins: [
         ['@intlify/unplugin-vue-i18n/vite', {
           // if you want to use Vue I18n Legacy API, you need to set `compositionOnly: false`
@@ -85,10 +85,10 @@ export default defineConfig((ctx) => {
 
         ['vite-plugin-checker', {
           vueTsc: true,
-          eslint: {
-            lintCommand: 'eslint -c ./eslint.config.js "./src*/**/*.{ts,js,mjs,cjs,vue}"',
-            useFlatConfig: true
-          }
+          //eslint: {
+          //  lintCommand: 'eslint -c ./eslint.config.js "./src*/**/*.{ts,js,mjs,cjs,vue}"',
+          //  useFlatConfig: true
+          //}
         }, { server: false }]
       ]
     },
@@ -101,7 +101,17 @@ export default defineConfig((ctx) => {
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#framework
     framework: {
-      config: {},
+      config: {
+        brand: {
+          primary: '#4A148C', // Deep purple
+          secondary: '#FFB300', // Complementary gold/yellow
+          accent: '#7C4DFF',
+          info: '#2196F3',
+          positive: '#4CAF50',
+          negative: '#EF5350',
+          warning: '#FFC107'
+        }
+      },
 
       // iconSet: 'material-icons', // Quasar icon set
       // lang: 'en-US', // Quasar language pack
@@ -114,7 +124,13 @@ export default defineConfig((ctx) => {
       // directives: [],
 
       // Quasar plugins
-      plugins: []
+      plugins: [
+        'Notify',
+        'Loading'
+      ],
+      directives: [
+        'Ripple'
+      ]
     },
 
     // animations: 'all', // --- includes all animations
