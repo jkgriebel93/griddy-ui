@@ -113,9 +113,30 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-// import { useQuasar } from 'quasar'; // If you needed Quasar specific features here
+import { api } from 'boot/axios';
+import { useQuasar } from 'quasar'; // If you needed Quasar specific features here
 
-// const $q = useQuasar(); // Initialize Quasar utilities if needed
+
+const leagues = ref([]);
+const loading = ref(true);
+const error = ref(null);
+const $q = useQuasar(); // Initialize Quasar utilities if needed
+
+const fetchData = async () => {
+  loading.value = true;
+  error.value = null;
+  try {
+    const response = await api.get(`core/league/`);
+    leagues.value = response.data;
+    console.log(leagues.value)
+  } catch (err) {
+    console.error(error);
+    error.value = err.message || 'Failed to fetch league data';
+  } finally {
+    loading.value = false;
+  }
+};
+
 
 const upcomingGames = ref([]);
 const topLeagues = ref([]);
@@ -123,6 +144,7 @@ const trendingPlayers = ref([]);
 const latestNews = ref([]);
 
 onMounted(() => {
+  fetchData();
   // Simulate API calls for American Football
   upcomingGames.value = [
     { id: 1, homeTeam: 'Chiefs', awayTeam: 'Ravens', date: 'Thu, Sep 5', league: 'NFL' },
