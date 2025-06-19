@@ -193,6 +193,7 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue';
+import { api } from 'boot/axios.js';
 import { useRoute } from 'vue-router';
 import { useQuasar } from 'quasar';
 
@@ -240,7 +241,19 @@ const loadLeagueData = async (id) => {
     message: 'Loading league data...'
   });
   console.log(`Fetching data for league/conference ID: ${id}`);
-  // Simulate API calls for American Football
+
+  try {
+    const response = await api.get(`core/league/${id}`);
+    console.log(response);
+    league.value = response.data;
+  } catch (error) {
+    console.error(error);
+    error.value = err.message || 'Failed to fetch league data';
+  } finally {
+    $q.loading.value = false;
+  }
+
+/**
   league.value = {
     id: id,
     name: id.toUpperCase() === 'NFL' ? 'National Football League' : id.toUpperCase(),
@@ -249,6 +262,7 @@ const loadLeagueData = async (id) => {
     currentSeason: '2024',
     description: `Detailed information about the ${id.toUpperCase()} season, including its structure, teams, and key statistics.`
   };
+    **/
   standingsAFCWest.value = [
     { team: 'Chiefs', teamId: 101, wins: 12, losses: 5, ties: 0, winPct: 0.706, pointsFor: 440, pointsAgainst: 330, pointDiff: 110 },
     { team: 'Chargers', teamId: 102, wins: 9, losses: 8, ties: 0, winPct: 0.529, pointsFor: 380, pointsAgainst: 350, pointDiff: 30 },

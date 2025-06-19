@@ -36,14 +36,14 @@
           <q-card-section>
             <div class="row q-col-gutter-sm">
               <div
-                v-for="league in topLeagues"
+                v-for="league in leagues"
                 :key="league.id"
                 class="col-6 col-sm-4 col-md-4"
               >
                 <q-card clickable v-ripple :to="`/leagues/${league.id}`" class="text-center">
                   <q-img :src="league.logo" fit="contain" style="height: 80px;" class="q-my-sm" />
                   <q-card-section>
-                    <div class="text-subtitle2">{{ league.name }}</div>
+                    <div class="text-subtitle2"><RouterLink :to="`/leagues/${league.id}`">{{ league.alias }}</RouterLink></div>
                   </q-card-section>
                 </q-card>
               </div>
@@ -127,8 +127,9 @@ const fetchData = async () => {
   error.value = null;
   try {
     const response = await api.get(`core/league/`);
+    console.log(response);
     leagues.value = response.data;
-    console.log(leagues.value)
+    console.log(leagues)
   } catch (err) {
     console.error(error);
     error.value = err.message || 'Failed to fetch league data';
