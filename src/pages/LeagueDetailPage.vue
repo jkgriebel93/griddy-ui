@@ -2,7 +2,7 @@
   <q-page class="q-pa-md" v-if="league">
     <h1 class="text-h4 q-mb-md">{{ league.name }}</h1>
 
-    <q-img :src="league.logo" fit="contain" style="max-height: 150px; width: 100%;" class="q-mb-md" />
+    <!--q-img :src="league.logo" fit="contain" style="max-height: 150px; width: 100%;" class="q-mb-md" /-->
 
     <q-tabs
       v-model="tab"
@@ -36,37 +36,39 @@
       <q-tab-panel name="standings">
         <q-card>
           <q-card-section>
-            <div class="text-h6">Current Standings</div>
+            <div class="text-h4">Current Standings</div>
           </q-card-section>
           <q-card-section>
-            <h3 class="text-subtitle1 q-mb-sm">AFC West</h3>
+            <h3 class="text-subtitle1 q-mb-sm"> XFL Conference</h3>
             <q-table
-              :rows="standingsAFCWest"
+              :rows="standingsXFLConf"
               :columns="standingsColumns"
-              row-key="teamId"
+              row-key="id"
               hide-bottom
               class="q-mb-md"
             >
               <template v-slot:body-cell-team="props">
                 <q-td :props="props">
-                  <router-link :to="`/teams/${props.row.teamId}`" class="text-blue-8">{{ props.row.team }}</router-link>
+                  <router-link :to="`/teams/${props.row.id}`" class="text-blue-8">{{ props.row.name }}</router-link>
                 </q-td>
               </template>
             </q-table>
 
-            <h3 class="text-subtitle1 q-mb-sm">NFC North</h3>
+            <h3 class="text-subtitle1 q-mb-sm">USFL Conference</h3>
             <q-table
-              :rows="standingsNFCNorth"
+              :rows="standingsUSFLConf"
               :columns="standingsColumns"
-              row-key="teamId"
+              row-key="id"
               hide-bottom
+              class="q-mb-md"
             >
               <template v-slot:body-cell-team="props">
                 <q-td :props="props">
-                  <router-link :to="`/teams/${props.row.teamId}`" class="text-blue-8">{{ props.row.team }}</router-link>
+                  <router-link :to="`/teams/${props.row.id}`" class="text-blue-8">{{ props.row.name }}</router-link>
                 </q-td>
               </template>
             </q-table>
+
           </q-card-section>
         </q-card>
       </q-tab-panel>
@@ -205,10 +207,15 @@ const props = defineProps({
 });
 
 const league = ref(null);
+
+// TODO: This is duplicating the standings data in memory. Not idea, but just want
+// to play with the UI elements
+const standings = ref(null);
+
 const tab = ref('overview');
 
-const standingsAFCWest = ref([]);
-const standingsNFCNorth = ref([]);
+const standingsXFLConf = ref([]);
+const standingsUSFLConf = ref([]);
 const schedule = ref([]);
 const passingLeaders = ref([]);
 const rushingLeaders = ref([]);
@@ -219,14 +226,14 @@ const weeks = ref(['All', 'Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5']);
 const selectedWeek = ref('All');
 
 const standingsColumns = [
-  { name: 'team', required: true, label: 'Team', align: 'left', field: 'team', sortable: true },
+  { name: 'team', required: true, label: 'Team', align: 'left', field: 'name', sortable: true },
   { name: 'wins', label: 'W', align: 'center', field: 'wins', sortable: true },
   { name: 'losses', label: 'L', align: 'center', field: 'losses', sortable: true },
   { name: 'ties', label: 'T', align: 'center', field: 'ties', sortable: true },
-  { name: 'winPct', label: 'PCT', align: 'center', field: 'winPct', sortable: true, format: val => val.toFixed(3) },
-  { name: 'pointsFor', label: 'PF', align: 'center', field: 'pointsFor', sortable: true },
-  { name: 'pointsAgainst', label: 'PA', align: 'center', field: 'pointsAgainst', sortable: true },
-  { name: 'pointDiff', label: 'Diff', align: 'center', field: 'pointDiff', sortable: true },
+  { name: 'winPct', label: 'PCT', align: 'center', field: 'win_pct', sortable: true, format: val => val.toFixed(3) },
+  { name: 'pointsFor', label: 'PF', align: 'center', field: 'points_for', sortable: true },
+  { name: 'pointsAgainst', label: 'PA', align: 'center', field: 'points_against', sortable: true },
+  // { name: 'pointDiff', label: 'Diff', align: 'center', field: 'pointDiff', sortable: true },
 ];
 
 const filteredSchedule = computed(() => {
@@ -244,8 +251,8 @@ const loadLeagueData = async (id) => {
 
   try {
     const response = await api.get(`core/league/${id}`);
-    console.log(response);
     league.value = response.data;
+    standings.value = league.value.standings;
   } catch (error) {
     console.error(error);
     error.value = err.message || 'Failed to fetch league data';
@@ -263,14 +270,11 @@ const loadLeagueData = async (id) => {
     description: `Detailed information about the ${id.toUpperCase()} season, including its structure, teams, and key statistics.`
   };
     **/
-  standingsAFCWest.value = [
-    { team: 'Chiefs', teamId: 101, wins: 12, losses: 5, ties: 0, winPct: 0.706, pointsFor: 440, pointsAgainst: 330, pointDiff: 110 },
-    { team: 'Chargers', teamId: 102, wins: 9, losses: 8, ties: 0, winPct: 0.529, pointsFor: 380, pointsAgainst: 350, pointDiff: 30 },
-  ];
-  standingsNFCNorth.value = [
-    { team: 'Lions', teamId: 103, wins: 12, losses: 5, ties: 0, winPct: 0.706, pointsFor: 460, pointsAgainst: 360, pointDiff: 100 },
-    { team: 'Packers', teamId: 104, wins: 9, losses: 8, ties: 0, winPct: 0.529, pointsFor: 390, pointsAgainst: 370, pointDiff: 20 },
-  ];
+// TODO: Verify you have the right conference by name instead of indexing like this
+  standingsXFLConf.value = standings.value.conferences[0].divisions[0].teams;
+  standingsUSFLConf.value = standings.value.conferences[0].divisions[1].teams;
+
+
   schedule.value = [
     { id: 201, homeTeam: 'Chiefs', homeScore: 28, awayScore: 20, awayTeam: 'Ravens', date: '2024-09-05', status: 'Finished', week: 'Week 1' },
     { id: 202, homeTeam: 'Lions', homeScore: null, awayScore: null, awayTeam: 'Rams', date: '2024-09-08', status: 'Scheduled', week: 'Week 1' },
